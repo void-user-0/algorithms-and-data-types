@@ -1,16 +1,11 @@
 CC=gcc
-CFLAGS=-O2 -march=native
-DEBUG_FLAGS=-g -Werror
+CFLAGS=-Wall -ggdb
 
-all: ll.o
+list.o: list.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
-ll.o: linked_list.c
-	$(CC) -c $< $(DEBUG_FLAGS) $(CFLAGS) -o $@
-	
-ll_example: ll.o
-	$(CC) $< example_usage.c -o $@
+example: list.o
+	$(CC) $< example.c -o $@
 
 clean:
-	rm -f ll.o ll_example
-
-.PHONY: clean
+	rm -rf list.o example
