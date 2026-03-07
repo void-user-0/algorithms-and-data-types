@@ -1,0 +1,12 @@
+# build example or start clean (nmake -f Makefile.win {example or clean})
+
+CC=cl # windows msvc compiler (VS build tools)
+
+linked_list.obj:
+	$(CC) /c linked_list.c
+
+example: 
+	$(CC) linked_list.c example.c
+
+clean:
+	del linked_list.obj example
