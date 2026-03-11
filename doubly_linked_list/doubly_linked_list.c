@@ -1,9 +1,8 @@
-#include <stdlib.h>
-#include "dll.h"
+#include "doubly_linked_list.h"
 
-struct list *new_list() 
+doubly_linked_list *doubly_linked_list_new() 
 {
-  struct list *list = malloc(sizeof(struct list));
+  doubly_linked_list *list = malloc(sizeof(struct doubly_linked_list));
   if (!list)
     return NULL;
   list->head = list->tail = NULL;
@@ -11,9 +10,9 @@ struct list *new_list()
   return list;
 }
 
-struct node *new_node() 
+doubly_linked_list_node *doubly_linked_list_new_node() 
 {
-  struct node *node = malloc(sizeof(struct node));
+  doubly_linked_list_node *node = malloc(sizeof(struct doubly_linked_list_node));
   if (!node)
     return NULL;
   node->data = node->next = node->prev = NULL;
@@ -21,13 +20,13 @@ struct node *new_node()
   return node;
 }
 
-void clean(struct list *list)
+void doubly_linked_list_clean(doubly_linked_list *list)
 {
   if (!list || !list->head)
     return;
 
-  struct node *node = list->head;
-  struct node *tmp = NULL;
+  struct doubly_linked_list_node *node = list->head;
+  struct doubly_linked_list_node *tmp = NULL;
   while (node != NULL) {
     tmp = node->next;
     free(node);
@@ -37,41 +36,42 @@ void clean(struct list *list)
   list->head = list->tail = NULL;
 }
 
-void destroy(struct list *list)
+void doubly_linked_list_destroy(doubly_linked_list *list)
 {
   if (!list)
     return;
 
-  clean(list);
+  doubly_linked_list_clean(list);
   free(list);
 }
 
-void add(struct list *list, void *data)
+doubly_linked_list_status doubly_linked_list_insert_head(doubly_linked_list *list, void *data)
 {
   if (!list)
-    return;
+    return INSERT_FAILURE;
 
-  struct node *node = new_node();
+  doubly_linked_list_node *node = doubly_linked_list_new_node();
   if (!node)
-    return;
+    return INSERT_FAILURE;
   node->data = data;
 
   if (!list->head) {
     list->head = list->tail = node;
-    return;
+    return INSERT_SUCCESS;
   }
 
   list->tail->next = node;
   node->prev = list->tail;
   list->tail = node;
+  return INSERT_SUCCESS;
 }
 
-struct node *search(struct list *list, void *data)
+doubly_linked_list_node *doubly_linked_list_search_node(doubly_linked_list *list, void *data)
 {
   if (!list || !list->head)
     return NULL;
 
-  struct node *cur = list->head;
+  doubly_linked_list_node *cur = list->head;
 
   while (cur != NULL) {
     if (cur->data == data) {
@@ -82,14 +82,15 @@ struct node *search(struct list *list, void *data)
   return NULL;
 }
 
-void del(struct list *list, void *data)
+doubly_linked_list_status doubly_linked_list_delete_node(doubly_linked_list *list, void *data)
 {
   if (!list || !list->head) 
-    return;
+    return DELETE_FAILURE;
 
-  struct node *node = search(list, data);
+  doubly_linked_list_node *node = doubly_linked_list_search_node(list, data);
+  
   if (!node) 
-    return;
+    return DELETE_FAILURE;
 
   node->prev
     ? (node->prev->next = node->next)
@@ -100,4 +101,6 @@ void del(struct list *list, void *data)
     : (list->tail = node->prev);
 
   free(node);
+
+  return DELETE_SUCCESS;
 }
